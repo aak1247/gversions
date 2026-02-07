@@ -1,4 +1,4 @@
-// Package gverions provides semver-aligned version comparison with support for
+// Package gversions provides semver-aligned version comparison with support for
 // "postrelease" suffixes (e.g. hotfix).
 //
 // SemVer defines prerelease suffixes like "-alpha", "-beta", "-rc" which sort
@@ -17,4 +17,4 @@
 //     the prefix is ignored for comparison.
 //   - Unknown suffixes are treated as postrelease by default (so they sort after
 //     stable) to match common "tag" expectations. You can override ordering via Options.
-package gverions
+package gversions

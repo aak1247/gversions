@@ -1,4 +1,4 @@
-package gverions
+package gversions
 
 import (
 	"regexp"
@@ -56,16 +56,22 @@ func CompareWithOptions(a, b string, opt Options) int {
 		// Strip v/V prefix.
 		s = strings.TrimPrefix(s, "v")
 		s = strings.TrimPrefix(s, "V")
-		// Strip SemVer build metadata (ignored for ordering in SemVer).
-		if idx := strings.IndexByte(s, '+'); idx >= 0 {
-			s = s[:idx]
-		}
 		// Strip product prefix (everything before the first digit).
 		if idx := strings.IndexFunc(s, func(r rune) bool { return unicode.IsDigit(r) }); idx > 0 {
 			s = s[idx:]
 		}
 		// Treat underscore as dot.
 		s = strings.ReplaceAll(s, "_", ".")
+		// '+' handling:
+		// - If the version already contains dots, treat '+' as SemVer build metadata delimiter and ignore it.
+		// - Otherwise, treat '+' as a legacy separator (e.g. "1+0+0" == "1.0.0").
+		if idx := strings.IndexByte(s, '+'); idx >= 0 {
+			if strings.Contains(s, ".") {
+				s = s[:idx]
+			} else {
+				s = strings.ReplaceAll(s, "+", ".")
+			}
+		}
 		return s
 	}
 

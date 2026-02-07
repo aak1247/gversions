@@ -1,4 +1,4 @@
-package gverions
+package gversions
 
 import "testing"
 
@@ -16,6 +16,7 @@ func TestCompare(t *testing.T) {
 		{name: "V prefix ignored", a: "v1.0.0", b: "1.0.0", expected: 0},
 		{name: "Product prefix ignored", a: "hive.1.0.0", b: "1.0.0", expected: 0},
 		{name: "Underscore treated as dot", a: "1_0_0", b: "1.0.0", expected: 0},
+		{name: "Legacy plus treated as dot", a: "1+0+0", b: "1.0.0", expected: 0},
 		{name: "Build metadata ignored", a: "1.0.0+build.1", b: "1.0.0+build.2", expected: 0},
 		{name: "Build metadata ignored vs stable", a: "1.0.0+build.1", b: "1.0.0", expected: 0},
 		{name: "Longer numeric wins", a: "1.0.0.1", b: "1.0.0", expected: 1},
@@ -88,5 +89,14 @@ func BenchmarkCompare(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		Compare(a, c)
+	}
+}
+
+func TestCompareSemver(t *testing.T) {
+	if got := CompareSemver("1.0.0-foo", "1.0.0"); got >= 0 {
+		t.Fatalf("CompareSemver prerelease should be < stable, got %d", got)
+	}
+	if got := CompareSemver("1.0.0+build.1", "1.0.0+build.2"); got != 0 {
+		t.Fatalf("CompareSemver build metadata ignored, got %d", got)
 	}
 }
